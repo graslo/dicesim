@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Betting Simulator</title>
+  </head>
+  <body>
+<div class="container">
+<h3 class="text-center">Dice Betting Simulator</h3>
+<form action="#" onsubmit="betSim();return false">
+	<div class="form-row">
+	<div class="col-md-12">
+	<div class="card">
+	  <div class="card-body">
+		  <div class="form-row">
+			<div class="form-group col-md-8">
+			  <label for="serverSeed">Server Seed</label>
+			  <input type="text" class="form-control" name="serverSeed" id="serverSeed" value="05721ce3a5cc34571eb3801eff12bd99b359ef33814e9e0630dc9b367d56c66f">
+			</div>
+			<div class="form-group col-md-4">
+			  <label for="clientSeed">Client Seed</label>
+			  <input type="text" class="form-control" name="clientSeed" id="clientSeed" value="xRnQUJm4T9J3mcjO77mpNgQBQCqZZQ">
+			</div>
+		  </div>
+		 </div>
+	 </div>
+	 </div>
+	</div>
+	<br />
+	<div class="form-row">
+	<div class="col-md-12">
+	<div class="card">
+	  <div class="card-body">
+		  <div class="form-row">
+			<div class="form-group col-md-2">
+			  <label for="numRolls">Number of rolls</label>
+			  <input type="number" class="form-control" name="numRolls" id="numRolls" value="1000">
+			</div>
+			<div class="form-group col-md-2">
+			  <label for="startBal">Start Balance</label>
+			  <input type="text" class="form-control" name="startBal" id="startBal" value="0.02500000">
+			</div>
+			<div class="form-group col-md-2">
+			  <label for="baseBet">Base Bet</label>
+			  <input type="text" class="form-control" name="baseBet" id="baseBet" value="0.00000010">
+			</div>
+			<div class="form-group col-md-2">
+			  <label for="winChance">Win Chance</label>
+			  <input type="number" class="form-control" name="winChance" id="winChance" value="49.5">
+			</div>
+			<div class="form-group col-md-2">
+			  <label for="payout">Payout(soon)</label>
+			  <input type="text" class="form-control" name="payout" id="payout" value="2x" disabled>
+			</div>
+			<div class="form-group col-md-2">
+			  <label for="switchHiLow">Switch Hi/Low</label>
+			  <select name="switchHiLow" id="switchHiLow" class="form-control">
+				<option value="never" selected>Never</option>
+				<option value="on_win">On Win</option>
+				<option value="on_loss">On Loss</option>
+				<option value="each_bet">Each Bet</option>
+			  </select>
+			</div>
+		  </div>
+		 </div>
+	 </div>
+	 </div>
+	</div>
+	<br />
+  <div class="form-row">
+	  <div class="col-md-6">
+		<div class="card">
+		  <div class="card-body">
+			<h3>On Win:</h3>
+			<div class="form-row">
+			<div class="form-group col-md-4">
+			  <label for="ow_changeBet"><input type="radio" name="onWin" id="owrchangeBet" value="changeBet"> Change bet by %</label>
+			  <input type="number" class="form-control" name="ow_changeBet" id="ow_changeBet" value="200.00">
+			</div>
+			<div class="form-group col-md-4">
+			  <label for="ow_resetBase"><input type="radio" name="onWin" id="owrReset" value="resetBase" checked> Reset to base</label>
+			</div>
+			<div class="form-group col-md-4">
+			  <label for="ow_stop"><input type="radio" name="onWin" id="owrStop" value="stop"> Stop</label>
+			</div>
+			</div>
+		  </div>
+		</div>
+	  </div>
+	  <div class="col-md-6">
+		<div class="card">
+		  <div class="card-body">
+			<h3>On Loss:</h3>
+			<div class="form-row">
+			<div class="form-group col-md-5">
+			  <label for="olrchangeBet"><input type="radio" name="onLoss" id="olrchangeBet" value="changeBet" checked> Change bet by %</label>
+			  <input type="number" class="form-control" name="ol_changeBet" id="ol_changeBet" value="200.00">
+			</div>
+			<div class="form-group col-md-4">
+			  <label for="olrReset"><input type="radio" name="onLoss" id="olrReset" value="resetBase"> Reset to base</label>
+			</div>
+			<div class="form-group col-md-3">
+			  <label for="olrStop"><input type="radio" name="onLoss" id="olrStop" value="stop"> Stop</label>
+			</div>
+			</div>
+		  </div>
+		</div>
+	  </div>
+	</div>
+	<br />
+  <div class="form-row">
+	  <div class="col-md-6">
+		<div class="card">
+		  <div class="card-body">
+			<h3>Stop If: (soon)</h3>
+			<div class="form-row">
+			<div class="form-group col-md-2">
+			  <label for="stopIf1"><input type="radio" name="stopIf" id="stopIf1" value="bust"> Bust</label>
+			</div>
+			<div class="form-group col-md-5">
+			  <label for="stopIf2"><input type="radio" name="stopIf" id="stopIf2" value="balanceAbove"> Balance is above</label>
+			  <input type="text" class="form-control" name="balAbove" id="balAbove" placeholder="0.00%">
+			</div>
+			<div class="form-group col-md-5">
+			  <label for="stopIf3"><input type="radio" name="stopIf" id="stopIf3" value="balanceBelow"> Balance is below</label>
+			  <input type="text" class="form-control" name="balBelow" id="balBelow" value="0.00000010">
+			</div>
+			</div>
+		  </div>
+		</div>
+	  </div>
+	  <div class="col-md-6">
+		<div class="card">
+		  <div class="card-body">
+			<h3>Output:</h3>
+			<div class="form-row">
+			<div class="form-group col-md-4">
+			  <label for="summary"><input type="radio" name="showMe" id="summary" value="summary" checked> Summary</label>
+			</div>
+			<div class="form-group col-md-5">
+			  <label for="showBetsAbove"><input type="radio" name="showMe" id="showBetsAbove" value="showBetsAbove"> Bets Above</label>
+			  <input type="text" class="form-control" name="betsAbove" id="betsAbove" value="0.00000010">
+			</div>
+			<div class="form-group col-md-3">
+			  <label for="allbets"><input type="radio" name="showMe" id="allbets" value="allbets"> All Bets</label>
+			</div>
+			</div>
+		  </div>
+		</div>
+	  </div>
+	</div>
+	<br />
+	<div class="form-row">
+	  <div class="col-md-12">
+		<div class="text-center">
+			<button type="submit" class="btn btn-primary">Start Simulation</button>
+		</div>
+	  </div>
+	</div>
+</form>
+
+<br />
+<div id="resultsdiv" class="small"></div>
+<br /><br /><br /><br /><br /><br />
+</div>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.3.2/sha256.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha512/0.2.2/sha512.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-url-parser/2.3.1/purl.min.js"></script>
+<script>
+Number.prototype.toFixedNumber = function(digits, base){
+  var pow = Math.pow(base||10, digits);
+  return Math.round(this*pow) / pow;
+}
+
+function showNumber(n){
+	// to avoid rounding issues, I multiply numbers by 8 to avoid decimals then add then back when displaying
+	// divide by 10000000 then do toFixed
+	n = (n/10000000);
+	n = n.toFixed(8);
+	return n;
+}
+
+function useNumber(n){
+	// multiply number by 10000000 to get rid of decimal
+	n = (n*10000000);
+	return n;
+}
+
+function flipHighLow(highLow){
+	if (highLow == "high"){
+		return "low";
+	} else {
+		return "high";
+	}
+}
+  
+function getRoll(serverSeed, clientSeed, nonce) {
+  var hash = sha512(serverSeed + clientSeed + nonce);
+  var index = 0;
+  do {
+    var lucky = parseInt(hash.substr(index, 5), 16);
+    index += 5;
+  } while (lucky >= 1000000);
+  return lucky % 10000;
+}
+
+function betSim(){
+	// clear div
+	document.getElementById('resultsdiv').innerHTML = "";
+	
+	var betHiorLow = "high";
+	var numRolls = document.getElementById("numRolls").value;
+	var winChance = document.getElementById("winChance").value;
+	var startBal = useNumber(document.getElementById("startBal").value);
+	var baseBet = useNumber(document.getElementById("baseBet").value);
+	var switchHiLow = document.getElementById("switchHiLow").value;
+	
+	var onWin = "";
+	if (document.getElementById("owrReset").checked) {
+		onWin = "resetBase";
+	}
+	if (document.getElementById("owrchangeBet").checked) {
+		onWin = "changeBet";
+	}
+	if (document.getElementById("owrStop").checked) {
+		onWin = "stop";
+	}
+	
+	var onLoss = "";
+	if (document.getElementById("olrReset").checked) {
+		onLoss = "resetBase";
+	}
+	if (document.getElementById("olrchangeBet").checked) {
+		onLoss = "changeBet";
+	}
+	if (document.getElementById("olrStop").checked) {
+		onLoss = "stop";
+	}
+	
+	var ow_changeBet = document.getElementById("ow_changeBet").value;
+	var ol_changeBet = document.getElementById("ol_changeBet").value;
+	
+	
+	var showMe = "summary";
+	if (document.getElementById("allbets").checked) {
+		showMe = "allbets";
+		document.getElementById('resultsdiv').innerHTML += "<h3 class=\"text-center\">Bets:</h3>"
+	}
+	if (document.getElementById("showBetsAbove").checked) {
+		showMe = "showBetsAbove";
+		document.getElementById('resultsdiv').innerHTML += "<h3 class=\"text-center\">Large Bets:</h3>"
+	}
+	
+	var betsAbove = useNumber(document.getElementById("betsAbove").value);
+	
+	var currBetAmt = baseBet;
+	var currBalance = startBal;
+	
+	// variables to track streaks for summary
+	var totalLosses = 0;
+	var totalWins = 0;
+	var currWinStreak = 0;
+	var currLossStreak = 0;
+	var biggestWinStreak = 0;
+	var biggestLossStreak = 0;
+	var highestBalance = startBal;
+	var lowestBalance = startBal;
+	var totalWagered = 0;
+	var allLossStreaks = [];
+	var allWinStreaks = [];
+	
+	
+	// do rolls
+	for (i = 0; i < numRolls; i++) {
+		thisRollNumber = getRoll(document.getElementById("serverSeed").value,document.getElementById("clientSeed").value,i);
+	  
+		var wonLost = "lost";
+		var showThisBet = "no";
+		lowNumber = (winChance / 100) * 10000;
+		highNumber = 9999-((winChance / 100) * 10000);
+		if (betHiorLow == "high"){
+			var winRange = highNumber + "-10000";
+			if (thisRollNumber > highNumber){
+				wonLost = "won";
+			}
+		} else {
+			var winRange = "0-" + lowNumber;
+			if (thisRollNumber < lowNumber){
+				wonLost = "won";
+			}
+		}
+		var thisBetVerbose = "Nonce: " + i + " - I bet " + showNumber(currBetAmt) + " on " + betHiorLow + " (" + winRange + "), rolled " + thisRollNumber + ", so I " + wonLost + ".";
+		
+		// deduct bet amount
+		currBalance -= currBetAmt;
+		totalWagered += currBetAmt;
+		
+		// is my balance a new low?
+		if (lowestBalance > currBalance){
+			lowestBalance = currBalance;
+		}
+		
+		// did I reach my min balance?
+		
+		
+		
+		// is this a large bet?
+		if ( (showMe == "showBetsAbove") && (currBetAmt > betsAbove) ){
+			showThisBet = "yes";
+		}
+		
+		// did I win?
+		if (wonLost == "won"){
+			totalWins++;
+			currWinStreak++;
+			
+			// record previous loss streak
+			if (currLossStreak > 0){
+				if (allLossStreaks[currLossStreak]){
+					allLossStreaks[currLossStreak]++;
+				} else {
+					allLossStreaks[currLossStreak] = 1;
+				}
+				currLossStreak = 0;
+			}
+			
+			// pay me
+			var amtToPay = (99/winChance)*currBetAmt;
+			currBalance += amtToPay;
+			thisBetVerbose += " Paid myself " + showNumber(amtToPay) + ".";
+			
+			// flip on win?
+			if ( (switchHiLow == "on_win") || (switchHiLow == "each_bet") ){
+				betHiorLow = flipHighLow(betHiorLow);
+				thisBetVerbose += " Flipped bet to: " + betHiorLow + ".";
+			}
+			
+			// change bet on win?
+			if (onWin == "changeBet"){
+				currBetAmt *= (ow_changeBet/100);
+				thisBetVerbose += " Changed bet to " + showNumber(currBetAmt) + ".";
+			}
+			
+			// reset to start bet on win?
+			if (onWin == "resetBase"){
+				currBetAmt = baseBet;
+				thisBetVerbose += " Reset to base bet.";
+			}
+			
+			// is my win streak a new high?
+			if (currWinStreak > biggestWinStreak){
+				biggestWinStreak = currWinStreak;
+			}
+			
+			// is my balance a new high?
+			if (currBalance > highestBalance){
+				highestBalance = currBalance;
+			}
+			
+			
+		} else {
+			// I lost
+			totalLosses++;
+			currLossStreak++;
+			
+			// record previous win streak
+			if (currWinStreak > 0){
+				if (allWinStreaks[currWinStreak]){
+					allWinStreaks[currWinStreak]++;
+				} else {
+					allWinStreaks[currWinStreak] = 1;
+				}
+				currWinStreak = 0;
+			}
+
+			
+			// flip on loss?
+			if ( (switchHiLow == "on_loss") || (switchHiLow == "each_bet") ){
+				betHiorLow = flipHighLow(betHiorLow);
+				thisBetVerbose += " Flipped bet to: " + betHiorLow + ".";
+			}
+			
+			// change bet on loss?
+			if (onLoss == "changeBet"){
+				currBetAmt *= (ol_changeBet/100);
+				thisBetVerbose += " Changed bet to " + showNumber(currBetAmt) + ".";
+			}
+			
+			// reset to start bet on loss?
+			if (onLoss == "resetBase"){
+				currBetAmt = baseBet;
+				thisBetVerbose += " Reset to base bet.";
+			}
+			
+			// is my loss streak a new high?
+			if (currLossStreak > biggestLossStreak){
+				biggestLossStreak = currLossStreak;
+				thisBetVerbose += " Loss streak: " + currLossStreak + ".";
+			}
+			
+			// can I afford to place the next bet?
+			if (currBalance < currBetAmt){
+				thisBetVerbose += " I busted.";
+				document.getElementById('resultsdiv').innerHTML += thisBetVerbose + "<br />"
+				break;
+			}
+			
+		}
+		thisBetVerbose += " Balance: " + showNumber(currBalance) + ".";
+		
+		if ( (showMe == "allbets") || (showThisBet == "yes") ){
+			document.getElementById('resultsdiv').innerHTML += thisBetVerbose + "<br />";
+		}
+	}
+	
+	// post results
+	var resultsHTML = "<div class=\"row\"><div class=\"col col-md-5\">";
+	var profitLoss = currBalance - startBal;
+	resultsHTML += "<br /><h3 class=\"text-center\">Summary:</h3><br /><p class=\"h4\">"
+	
+	
+	
+	
+
+	
+	var totalRolls = totalWins + totalLosses;
+	var winPercent = totalWins*100/totalRolls;
+	var lossPercent = totalLosses*100/totalRolls;
+	var luck = totalWins*100/((winChance / 100)*totalRolls);
+	luck = luck.toFixed(2);
+	resultsHTML += "Total Rolls: " + totalRolls;
+	resultsHTML += "<br />Total Wins: " + totalWins + " (" + winPercent + "%)";
+	resultsHTML += "<br />Total Losses: " + totalLosses + " (" + lossPercent + "%)";
+	resultsHTML += "<br />Luck: " + luck + "%";
+	
+	resultsHTML += "<br /><br />Highest Win Streak: " + biggestWinStreak;
+	resultsHTML += "<br />Highest Loss Streak: " + biggestLossStreak;
+	
+	resultsHTML += "<br /><br />Start balance: " + showNumber(startBal);
+	resultsHTML += "<br />Final balance: " + showNumber(currBalance);
+	resultsHTML += "<br />Profit/Loss: " + showNumber(profitLoss);
+	
+	resultsHTML += "<br /><br />Highest Balance: " + showNumber(highestBalance);
+	resultsHTML += "<br />Lowest Balance: " + showNumber(lowestBalance);
+	resultsHTML += "<br />Total Wagered: " + showNumber(totalWagered);
+	
+	
+	resultsHTML += "</p></div><div class=\"col col-md-3\">";
+	resultsHTML += "<br /><h3 class=\"text-center\">Win Streaks:</h3>"
+	var i;
+	biggestWinStreak++;
+	resultsHTML += "<table class=\"table\"><thead><tr><th>Win Streak</th><th>Times Seen</th></tr></thead><tbody>";
+	for (i = 1; i < biggestWinStreak; i++) {
+		if (allWinStreaks[i]){
+			resultsHTML += '<tr><td>' + i + '</td><td>' + allWinStreaks[i] + '</td></tr>';
+		} else {
+			resultsHTML += '<tr><td>' + i + '</td><td>0</td></tr>';
+		}
+		
+	}
+	resultsHTML += "</tbody></table></div>";
+	
+	
+	
+	resultsHTML += "<div class=\"col col-md-1\"></div><div class=\"col col-md-3\">";
+	resultsHTML += "<br /><h3 class=\"text-center\">Loss Streaks:</h3>"
+	var i;
+	biggestLossStreak++;
+	resultsHTML += "<table class=\"table\"><thead><tr><th>Loss Streak</th><th>Times Seen</th></tr></thead><tbody>";
+	for (i = 1; i < biggestLossStreak; i++) {
+		if (allLossStreaks[i]){
+			resultsHTML += '<tr><td>' + i + '</td><td>' + allLossStreaks[i] + '</td></tr>';
+		} else {
+			resultsHTML += '<tr><td>' + i + '</td><td>0</td></tr>';
+		}
+		
+	}
+	resultsHTML += "</tbody></table></div></div>";
+	
+	
+	
+	
+	
+	document.getElementById('resultsdiv').innerHTML += resultsHTML;
+	
+}
+
+
+
+  </script>
+  
+  
+  </body>
+</html>
