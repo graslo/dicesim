@@ -52,10 +52,10 @@
 			</div>
 			<div class="form-group col-md-2">
 			  <label for="winChance">Win Chance</label>
-			  <input type="text" class="form-control" name="winChance" id="winChance" value="49.5">
+			  <input type="text" class="form-control" name="winChance" id="winChance" value="49.5" onchange="updatePayout()">
 			</div>
 			<div class="form-group col-md-2">
-			  <label for="payout">Payout(soon)</label>
+			  <label for="payout">Payout</label>
 			  <input type="text" class="form-control" name="payout" id="payout" value="2x" disabled>
 			</div>
 			<div class="form-group col-md-2">
@@ -118,14 +118,14 @@
 	  <div class="col-md-6">
 		<div class="card">
 		  <div class="card-body">
-			<h3>Stop If: (soon)</h3>
+			<h3>Stop If:</h3>
 			<div class="form-row">
 			<div class="form-group col-md-2">
 			  <label for="stopIf1"><input type="radio" name="stopIf" id="stopIf1" value="bust"> Bust</label>
 			</div>
 			<div class="form-group col-md-5">
 			  <label for="stopIf2"><input type="radio" name="stopIf" id="stopIf2" value="balanceAbove"> Balance is above</label>
-			  <input type="text" class="form-control" name="balAbove" id="balAbove" placeholder="0.00%">
+			  <input type="text" class="form-control" name="balAbove" id="balAbove" placeholder="0.00000010">
 			</div>
 			<div class="form-group col-md-5">
 			  <label for="stopIf3"><input type="radio" name="stopIf" id="stopIf3" value="balanceBelow"> Balance is below</label>
@@ -204,6 +204,16 @@ function flipHighLow(highLow){
 		return "high";
 	}
 }
+
+function updatePayout(){
+	//(99/winChance)
+	var winChance = Number(document.getElementById("winChance").value);
+	if (winChance > 0){
+		payoutNum = (99/winChance);
+		payoutNum = payoutNum.toString();
+		document.getElementById("payout").value = payoutNum + 'x';
+	}
+}
   
 function getRoll(serverSeed, clientSeed, nonce) {
   var hash = sha512(serverSeed + clientSeed + nonce);
@@ -251,6 +261,15 @@ function betSim(){
 	var ow_changeBet = document.getElementById("ow_changeBet").value;
 	var ol_changeBet = document.getElementById("ol_changeBet").value;
 	
+	var stopIf = "";
+	if (document.getElementById("stopIf2").checked) {
+		stopIf = "balanceAbove";
+	}
+	if (document.getElementById("stopIf3").checked) {
+		stopIf = "balanceBelow";
+	}
+	var balAbove = useNumber(document.getElementById("balAbove").value);
+	var balBelow = useNumber(document.getElementById("balBelow").value);
 	
 	var showMe = "summary";
 	if (document.getElementById("allbets").checked) {
@@ -279,12 +298,16 @@ function betSim(){
 	var totalWagered = 0;
 	var allLossStreaks = [];
 	var allWinStreaks = [];
+	var showOutcome = "";
+	var betThisRoll = 0;
 	
+	var betOutputTbl = "<table class=\"table table-bordered table-sm\"><thead class=\"thead-dark\"><tr><th>Nonce</th><th>Hi/Low</th><th>Roll</th><th>Won/Lost</th><th>BetAmt</th><th>Balance</tr></thead><tbody>";
 	
 	// do rolls
 	for (i = 0; i < numRolls; i++) {
 		thisRollNumber = getRoll(document.getElementById("serverSeed").value,document.getElementById("clientSeed").value,i);
-	  
+		
+		var trclass = "table-danger";
 		var wonLost = "lost";
 		var showThisBet = "no";
 		lowNumber = (winChance / 100) * 10000;
@@ -300,11 +323,13 @@ function betSim(){
 				wonLost = "won";
 			}
 		}
-		var thisBetVerbose = "Nonce: " + i + " - I bet " + showNumber(currBetAmt) + " on " + betHiorLow + " (" + winRange + "), rolled " + thisRollNumber + ", so I " + wonLost + ".";
 		
 		// deduct bet amount
 		currBalance -= currBetAmt;
 		totalWagered += currBetAmt;
+		
+		// save this bet for results table
+		betThisRoll = currBetAmt;
 		
 		// is my balance a new low?
 		if (lowestBalance > currBalance){
@@ -322,6 +347,7 @@ function betSim(){
 		
 		// did I win?
 		if (wonLost == "won"){
+			trclass = "table-success";
 			totalWins++;
 			currWinStreak++;
 			
@@ -338,24 +364,20 @@ function betSim(){
 			// pay me
 			var amtToPay = (99/winChance)*currBetAmt;
 			currBalance += amtToPay;
-			thisBetVerbose += " Paid myself " + showNumber(amtToPay) + ".";
 			
 			// flip on win?
 			if ( (switchHiLow == "on_win") || (switchHiLow == "each_bet") ){
 				betHiorLow = flipHighLow(betHiorLow);
-				thisBetVerbose += " Flipped bet to: " + betHiorLow + ".";
 			}
 			
 			// change bet on win?
 			if (onWin == "changeBet"){
 				currBetAmt *= (ow_changeBet/100);
-				thisBetVerbose += " Changed bet to " + showNumber(currBetAmt) + ".";
 			}
 			
 			// reset to start bet on win?
 			if (onWin == "resetBase"){
 				currBetAmt = baseBet;
-				thisBetVerbose += " Reset to base bet.";
 			}
 			
 			// is my win streak a new high?
@@ -388,51 +410,64 @@ function betSim(){
 			// flip on loss?
 			if ( (switchHiLow == "on_loss") || (switchHiLow == "each_bet") ){
 				betHiorLow = flipHighLow(betHiorLow);
-				thisBetVerbose += " Flipped bet to: " + betHiorLow + ".";
 			}
 			
 			// change bet on loss?
 			if (onLoss == "changeBet"){
 				currBetAmt *= (ol_changeBet/100);
-				thisBetVerbose += " Changed bet to " + showNumber(currBetAmt) + ".";
 			}
 			
 			// reset to start bet on loss?
 			if (onLoss == "resetBase"){
 				currBetAmt = baseBet;
-				thisBetVerbose += " Reset to base bet.";
 			}
 			
 			// is my loss streak a new high?
 			if (currLossStreak > biggestLossStreak){
 				biggestLossStreak = currLossStreak;
-				thisBetVerbose += " Loss streak: " + currLossStreak + ".";
-			}
-			
-			// can I afford to place the next bet?
-			if (currBalance < currBetAmt){
-				thisBetVerbose += " I busted.";
-				document.getElementById('resultsdiv').innerHTML += thisBetVerbose + "<br />"
-				break;
 			}
 			
 		}
-		thisBetVerbose += " Balance: " + showNumber(currBalance) + ".";
 		
 		if ( (showMe == "allbets") || (showThisBet == "yes") ){
-			document.getElementById('resultsdiv').innerHTML += thisBetVerbose + "<br />";
+			// add row to bet table
+			betOutputTbl += '<tr class="' + trclass + '"><td>' + i + '</td><td>' + betHiorLow + '</td><td>' + thisRollNumber + '</td><td>' + wonLost + '</td><td>' + showNumber(betThisRoll) + '</td><td>' + showNumber(currBalance) + '</td></tr>';
 		}
+		
+		// can I afford to place the next bet?
+		if (currBalance < currBetAmt){
+			showOutcome = "Nonce: " + i + " - Next bet would be " + showNumber(currBetAmt) + " and my balance was " + showNumber(currBalance) + " so I busted.";
+			break;
+		}
+		
+		
+		
+		
+		
+		// if my balance is above target
+		if ( (stopIf == "balanceAbove") && (currBalance > balAbove) ){
+			showOutcome = "Nonce: " + i + " - My balance was " + showNumber(currBalance) + " which is above my target.";
+			break;
+		}
+		
+		// if my balance is below target
+		if ( (stopIf == "balanceBelow") && (currBalance < balBelow) ){
+			showOutcome = "Nonce: " + i + " - My balance was " + showNumber(currBalance) + " which is below my target.";
+			break;
+		}
+		
+		
+		
 	}
+	betOutputTbl += "</tbody></table>";
+	
+	document.getElementById('resultsdiv').innerHTML += betOutputTbl + showOutcome +"<br />"
 	
 	// post results
 	var resultsHTML = "<div class=\"row\"><div class=\"col col-md-5\">";
 	var profitLoss = currBalance - startBal;
-	resultsHTML += "<br /><h3 class=\"text-center\">Summary:</h3><br /><p class=\"h4\">"
+	resultsHTML += "<br /><h3 class=\"text-center\">Summary:</h3><br /><p class=\"h5\">"
 	
-	
-	
-	
-
 	
 	var totalRolls = totalWins + totalLosses;
 	var winPercent = totalWins*100/totalRolls;
@@ -460,7 +495,7 @@ function betSim(){
 	resultsHTML += "<br /><h3 class=\"text-center\">Win Streaks:</h3>"
 	var i;
 	biggestWinStreak++;
-	resultsHTML += "<table class=\"table\"><thead><tr><th>Win Streak</th><th>Times Seen</th></tr></thead><tbody>";
+	resultsHTML += "<table class=\"table table-bordered table-sm\"><thead class=\"thead-dark\"><tr><th>Win Streak</th><th>Times Seen</th></tr></thead><tbody>";
 	for (i = 1; i < biggestWinStreak; i++) {
 		if (allWinStreaks[i]){
 			resultsHTML += '<tr><td>' + i + '</td><td>' + allWinStreaks[i] + '</td></tr>';
@@ -477,7 +512,7 @@ function betSim(){
 	resultsHTML += "<br /><h3 class=\"text-center\">Loss Streaks:</h3>"
 	var i;
 	biggestLossStreak++;
-	resultsHTML += "<table class=\"table\"><thead><tr><th>Loss Streak</th><th>Times Seen</th></tr></thead><tbody>";
+	resultsHTML += "<table class=\"table table-bordered table-sm\"><thead class=\"thead-dark\"><tr><th>Loss Streak</th><th>Times Seen</th></tr></thead><tbody>";
 	for (i = 1; i < biggestLossStreak; i++) {
 		if (allLossStreaks[i]){
 			resultsHTML += '<tr><td>' + i + '</td><td>' + allLossStreaks[i] + '</td></tr>';
