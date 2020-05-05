@@ -459,6 +459,18 @@ function betSim(){
 		
 		
 	}
+	
+	// record previous loss streak  -- duplicated this in case current streak busted me and wasn't recorded. This can probably be done differently.
+	if (currLossStreak > 0){
+		if (allLossStreaks[currLossStreak]){
+			allLossStreaks[currLossStreak]++;
+		} else {
+			allLossStreaks[currLossStreak] = 1;
+		}
+		currLossStreak = 0;
+	}
+	
+	
 	betOutputTbl += "</tbody></table>";
 	
 	document.getElementById('resultsdiv').innerHTML += betOutputTbl + showOutcome +"<br />"
@@ -471,7 +483,9 @@ function betSim(){
 	
 	var totalRolls = totalWins + totalLosses;
 	var winPercent = totalWins*100/totalRolls;
+	winPercent = winPercent.toFixed(2);
 	var lossPercent = totalLosses*100/totalRolls;
+	lossPercent = lossPercent.toFixed(2);
 	var luck = totalWins*100/((winChance / 100)*totalRolls);
 	luck = luck.toFixed(2);
 	resultsHTML += "Total Rolls: " + totalRolls;
