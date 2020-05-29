@@ -302,7 +302,7 @@ function betSim(){
 	var betThisRoll = 0;
 	
 	var betOutputTbl = "<table class=\"table table-bordered table-sm\"><thead class=\"thead-dark\"><tr><th>Nonce</th><th>Hi/Low</th><th>Roll</th><th>Won/Lost</th><th>BetAmt</th><th>Balance</tr></thead><tbody>";
-	
+	var rollCount = 0;
 	// do rolls
 	for (i = 0; i < numRolls; i++) {
 		thisRollNumber = getRoll(document.getElementById("serverSeed").value,document.getElementById("clientSeed").value,i);
@@ -456,7 +456,13 @@ function betSim(){
 			break;
 		}
 		
-		
+		// output to console every 100k rolls as a "keep-alive" for browser
+		rollCount = i+1;
+		if ( (rollCount % 100000 === 0) || (rollCount == numRolls) ){
+			var rollPercent = (rollCount/numRolls)*100;
+			rollPercent = Math.round(rollPercent);
+			console.log("Finished "+rollCount+" of "+numRolls+" rolls. ("+rollPercent+"%)");
+		}
 		
 	}
 	
